@@ -45,7 +45,7 @@ export function HeroSection() {
 
           <div className="mt-10 flex flex-col gap-4 sm:flex-row">
             <a
-              href="#"
+              href="/dashboard"
               className="inline-flex h-14 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-8 text-base font-semibold text-white shadow-xl shadow-blue-500/20 transition hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/25"
             >
               Start Free Trial

@@ -45,14 +45,14 @@ export function Navbar() {
 
         <div className="flex items-center gap-4">
           <Link
-            href="#"
+            href="/dashboard"
             className="hidden text-sm font-medium text-slate-700 transition hover:text-slate-950 sm:inline-flex"
           >
             Log in
           </Link>
 
           <Link
-            href="#"
+            href="/dashboard"
             className="inline-flex h-11 items-center justify-center rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-500/25"
           >
             Get Started

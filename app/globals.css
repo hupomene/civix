@@ -127,4 +127,27 @@
   html {
     @apply font-sans;
   }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  #civix-review-report,
+  #civix-review-report * {
+    visibility: visible;
+  }
+
+  #civix-review-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+  }
+
+  @page {
+    margin: 0.6in;
+  }
+}
 }
