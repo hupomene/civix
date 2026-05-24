@@ -77,7 +77,11 @@ const initialReview: AIReviewResult = {
   ],
 };
 
-export function ProjectWorkspace() {
+type ProjectWorkspaceProps = {
+  projectId: string;
+};
+
+export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
   const [documents, setDocuments] =
     useState<UploadedDocument[]>(initialDocuments);
 
@@ -87,6 +91,12 @@ export function ProjectWorkspace() {
 
   const [reviewResult, setReviewResult] =
     useState<AIReviewResult>(initialReview);
+
+  const [projectName, setProjectName] = useState("Lake Dallas Retail Renovation");
+  const [projectLocation, setProjectLocation] = useState(
+    "5008 S. Stemmons Freeway, Lake Dallas, TX"
+  );
+  const [projectType, setProjectType] = useState("Commercial Renovation");
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [lastAnalyzedChange, setLastAnalyzedChange] = useState(designChange);
@@ -101,7 +111,7 @@ export function ProjectWorkspace() {
       try {
         setIsLoadingWorkspace(true);
 
-        const response = await fetch("/api/projects/demo/workspace");
+        const response = await fetch(`/api/projects/${projectId}/workspace`);
 
         if (!response.ok) {
           throw new Error("Failed to load workspace from Supabase.");
@@ -112,6 +122,10 @@ export function ProjectWorkspace() {
         if (!data.ok || !data.workspace) {
           throw new Error(data.error ?? "Workspace response was invalid.");
         }
+
+        setProjectName(data.workspace.project.name);
+        setProjectLocation(data.workspace.project.location ?? "No location provided");
+        setProjectType(data.workspace.project.project_type ?? "Construction Project");
 
         if (data.workspace.documents.length > 0) {
           setDocuments(data.workspace.documents);
@@ -139,7 +153,7 @@ export function ProjectWorkspace() {
     }
 
     loadWorkspace();
-  }, []);
+  }, [projectId]);
   function handleAddDocuments(files: FileList | null) {
     if (!files || files.length === 0) return;
 
@@ -170,9 +184,10 @@ export function ProjectWorkspace() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          projectName: "Lake Dallas Retail Renovation",
-          projectLocation: "5008 S. Stemmons Freeway, Lake Dallas, TX",
-          projectType: "Commercial Renovation",
+          projectId,
+          projectName,
+          projectLocation,
+          projectType,
           designChange,
           documents,
         }),

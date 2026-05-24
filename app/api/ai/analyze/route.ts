@@ -3,6 +3,7 @@ import { mockAnalyzeDesignChange } from "@/lib/ai/mock-analyze-design-change";
 import { openAIAnalyzeDesignChange } from "@/lib/ai/openai-analyze-design-change";
 import { getOrCreateDemoProject } from "@/lib/database/demo-project";
 import { saveAIReview } from "@/lib/database/ai-reviews";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   AnalyzeDesignChangeRequest,
   AnalyzeDesignChangeResponse,
@@ -13,6 +14,26 @@ type AnalyzeResponseWithPersistence = AnalyzeDesignChangeResponse & {
   savedProjectId?: string;
   modelUsed?: string;
 };
+
+async function getProjectForSave(body: AnalyzeDesignChangeRequest) {
+  if (body.projectId && body.projectId !== "demo-project") {
+    const supabase = createAdminClient();
+
+    const { data: project, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("id", body.projectId)
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return project;
+  }
+
+  return getOrCreateDemoProject();
+}
 
 export async function POST(request: Request) {
   try {

@@ -177,7 +177,7 @@ export default function DashboardPage() {
                     recentProjects.map((project) => (
                       <Link
                         key={project.id}
-                        href="/projects/demo-project"
+                        href={`/projects/${project.id}`}
                         className="block rounded-2xl border border-slate-200 p-5 transition hover:-translate-y-0.5 hover:border-blue-200 hover:bg-blue-50/40 hover:shadow-md"
                       >
                         <div className="flex items-start justify-between gap-4">

@@ -6,9 +6,32 @@ function safeJsonArray<T>(value: unknown): T[] {
   return Array.isArray(value) ? (value as T[]) : [];
 }
 
-export async function getDemoProjectWorkspaceData() {
+function toReviewResult(latestReview: {
+  impact_summary: string;
+  affected_documents: unknown;
+  risks: unknown;
+  checklist: unknown;
+}): AIReviewResult {
+  return {
+    impactSummary: latestReview.impact_summary,
+    affectedDocuments: safeJsonArray<string>(latestReview.affected_documents),
+    risks: safeJsonArray<AIReviewResult["risks"][number]>(latestReview.risks),
+    checklist: safeJsonArray<string>(latestReview.checklist),
+  };
+}
+
+export async function getProjectWorkspaceData(projectId: string) {
   const supabase = createAdminClient();
-  const project = await getOrCreateDemoProject();
+
+  const { data: project, error: projectError } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", projectId)
+    .single();
+
+  if (projectError) {
+    throw new Error(projectError.message);
+  }
 
   const { data: latestReview, error: reviewError } = await supabase
     .from("ai_reviews")
@@ -41,16 +64,7 @@ export async function getDemoProjectWorkspaceData() {
     })) ?? [];
 
   const reviewResult: AIReviewResult | null = latestReview
-    ? {
-        impactSummary: latestReview.impact_summary,
-        affectedDocuments: safeJsonArray<string>(
-          latestReview.affected_documents
-        ),
-        risks: safeJsonArray<AIReviewResult["risks"][number]>(
-          latestReview.risks
-        ),
-        checklist: safeJsonArray<string>(latestReview.checklist),
-      }
+    ? toReviewResult(latestReview)
     : null;
 
   return {
@@ -59,4 +73,9 @@ export async function getDemoProjectWorkspaceData() {
     latestReview,
     reviewResult,
   };
+}
+
+export async function getDemoProjectWorkspaceData() {
+  const project = await getProjectForSave(body);
+  return getProjectWorkspaceData(project.id);
 }

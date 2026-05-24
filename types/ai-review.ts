@@ -20,6 +20,7 @@ export type AIReviewResult = {
 };
 
 export type AnalyzeDesignChangeRequest = {
+  projectId?: string;
   projectName: string;
   projectLocation: string;
   projectType: string;

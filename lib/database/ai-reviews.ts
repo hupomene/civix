@@ -1,5 +1,9 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AIReviewResult, UploadedDocument } from "@/types/ai-review";
+import type { Database } from "@/types/database";
+
+type UploadedDocumentInsert =
+  Database["public"]["Tables"]["uploaded_documents"]["Insert"];
 
 type SaveAIReviewInput = {
   projectId: string;
@@ -21,31 +25,33 @@ async function upsertUploadedDocumentMetadata({
   const supabase = createAdminClient();
 
   for (const document of documents) {
-    const { data: existingDocument, error: selectError } = await supabase
+    const { data: existingDocuments, error: selectError } = await supabase
       .from("uploaded_documents")
       .select("id")
       .eq("project_id", projectId)
       .eq("name", document.name)
       .eq("file_size", document.size)
-      .maybeSingle();
+      .limit(1);
 
     if (selectError) {
       throw new Error(selectError.message);
     }
 
-    if (existingDocument) {
+    if (existingDocuments && existingDocuments.length > 0) {
       continue;
     }
 
+    const documentRow: UploadedDocumentInsert = {
+      project_id: projectId,
+      name: document.name,
+      file_type: document.type,
+      file_size: document.size,
+      storage_path: null,
+    };
+
     const { error: insertError } = await supabase
       .from("uploaded_documents")
-      .insert({
-        project_id: projectId,
-        name: document.name,
-        file_type: document.type,
-        file_size: document.size,
-        storage_path: null,
-      });
+      .insert(documentRow as any);
 
     if (insertError) {
       throw new Error(insertError.message);
