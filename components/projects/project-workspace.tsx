@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AIReviewPanel } from "@/components/projects/ai-review-panel";
 import { ComplianceChecklist } from "@/components/projects/compliance-checklist";
 import { DesignChangeForm } from "@/components/projects/design-change-form";
@@ -9,6 +9,7 @@ import { ReviewReportPanel } from "@/components/projects/review-report-panel";
 import type {
   AIReviewResult,
   AnalyzeDesignChangeResponse,
+  ProjectWorkspaceResponse,
   UploadedDocument,
 } from "@/types/ai-review";
 import {
@@ -90,7 +91,55 @@ export function ProjectWorkspace() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [lastAnalyzedChange, setLastAnalyzedChange] = useState(designChange);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [savedReviewId, setSavedReviewId] = useState<string | null>(null);
+  const [modelUsed, setModelUsed] = useState<string | null>(null);
+  const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(true);
+  const [workspaceLoadedFromDb, setWorkspaceLoadedFromDb] = useState(false);
 
+  useEffect(() => {
+    async function loadWorkspace() {
+      try {
+        setIsLoadingWorkspace(true);
+
+        const response = await fetch("/api/projects/demo/workspace");
+
+        if (!response.ok) {
+          throw new Error("Failed to load workspace from Supabase.");
+        }
+
+        const data = (await response.json()) as ProjectWorkspaceResponse;
+
+        if (!data.ok || !data.workspace) {
+          throw new Error(data.error ?? "Workspace response was invalid.");
+        }
+
+        if (data.workspace.documents.length > 0) {
+          setDocuments(data.workspace.documents);
+        }
+
+        if (data.workspace.reviewResult && data.workspace.latestReview) {
+          setReviewResult(data.workspace.reviewResult);
+          setDesignChange(data.workspace.latestReview.design_change);
+          setLastAnalyzedChange(data.workspace.latestReview.design_change);
+          setSavedReviewId(data.workspace.latestReview.id);
+          setModelUsed(data.workspace.latestReview.model_used);
+        }
+
+        setWorkspaceLoadedFromDb(true);
+      } catch (error) {
+        console.error(error);
+        setAnalysisError(
+          error instanceof Error
+            ? error.message
+            : "Failed to load workspace from Supabase."
+        );
+      } finally {
+        setIsLoadingWorkspace(false);
+      }
+    }
+
+    loadWorkspace();
+  }, []);
   function handleAddDocuments(files: FileList | null) {
     if (!files || files.length === 0) return;
 
@@ -138,6 +187,8 @@ export function ProjectWorkspace() {
 
       setReviewResult(data.result);
       setLastAnalyzedChange(designChange);
+      setSavedReviewId(data.savedReviewId ?? null);
+      setModelUsed(data.modelUsed ?? null);
     } catch (error) {
       console.error(error);
       setAnalysisError(
@@ -191,6 +242,24 @@ export function ProjectWorkspace() {
             {analysisError && (
               <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                 {analysisError}
+              </div>
+            )}
+            {savedReviewId && (
+              <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+                AI review saved to Supabase successfully.
+                <span className="ml-2 font-mono text-xs text-emerald-700">
+                  Review ID: {savedReviewId}
+                </span>
+                {modelUsed && (
+                  <span className="ml-2 rounded-full bg-white px-2 py-1 text-xs font-semibold text-emerald-700">
+                    {modelUsed}
+                  </span>
+                )}
+              </div>
+            )}
+            {workspaceLoadedFromDb && !isLoadingWorkspace && (
+              <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+                Latest project workspace data loaded from Supabase.
               </div>
             )}
           </div>
@@ -254,7 +323,11 @@ export function ProjectWorkspace() {
                 Status
               </div>
               <p className="mt-2 font-semibold text-emerald-800">
-                {isAnalyzing ? "Analyzing" : "Review Ready"}
+                {isLoadingWorkspace
+                  ? "Loading"
+                  : isAnalyzing
+                  ? "Analyzing"
+                  : "Review Ready"}
               </p>
             </div>
           </div>
