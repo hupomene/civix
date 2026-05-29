@@ -27,7 +27,7 @@ export async function getOrCreateDemoProject() {
 
   const { data: newProject, error: insertError } = await supabase
     .from("projects")
-    .insert(DEMO_PROJECT)
+    .insert(DEMO_PROJECT as any)
     .select("*")
     .single();
 

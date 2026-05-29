@@ -53,6 +53,10 @@ export type Database = {
           file_type: string | null;
           file_size: number | null;
           storage_path: string | null;
+          extracted_text: string | null;
+          extracted_text_preview: string | null;
+          extraction_status: string;
+          extracted_at: string | null;
           created_at: string;
         };
         Insert: {
@@ -62,6 +66,10 @@ export type Database = {
           file_type?: string | null;
           file_size?: number | null;
           storage_path?: string | null;
+          extracted_text?: string | null;
+          extracted_text_preview?: string | null;
+          extraction_status?: string;
+          extracted_at?: string | null;
           created_at?: string;
         };
         Update: {
@@ -71,6 +79,10 @@ export type Database = {
           file_type?: string | null;
           file_size?: number | null;
           storage_path?: string | null;
+          extracted_text?: string | null;
+          extracted_text_preview?: string | null;
+          extraction_status?: string;
+          extracted_at?: string | null;
           created_at?: string;
         };
       };
@@ -84,6 +96,7 @@ export type Database = {
           affected_documents: Json;
           risks: Json;
           checklist: Json;
+          evidence_notes: Json;
           model_used: string | null;
           created_at: string;
         };
@@ -95,6 +108,7 @@ export type Database = {
           affected_documents?: Json;
           risks?: Json;
           checklist?: Json;
+          evidence_notes: Json;
           model_used?: string | null;
           created_at?: string;
         };
@@ -106,10 +120,45 @@ export type Database = {
           affected_documents?: Json;
           risks?: Json;
           checklist?: Json;
+          evidence_notes: Json;
           model_used?: string | null;
           created_at?: string;
         };
       };
+
+      document_chunks: {
+        Row: {
+          id: string;
+          document_id: string;
+          project_id: string;
+          chunk_index: number;
+          content: string;
+          content_preview: string | null;
+          token_estimate: number | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          document_id: string;
+          project_id: string;
+          chunk_index: number;
+          content: string;
+          content_preview?: string | null;
+          token_estimate?: number | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          document_id?: string;
+          project_id?: string;
+          chunk_index?: number;
+          content?: string;
+          content_preview?: string | null;
+          token_estimate?: number | null;
+          created_at?: string;
+        };
+      };
+
     };
   };
 };

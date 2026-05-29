@@ -57,3 +57,39 @@ create trigger set_projects_updated_at
 before update on public.projects
 for each row
 execute function public.set_updated_at();
+
+alter table public.uploaded_documents
+add column if not exists extracted_text text;
+
+alter table public.uploaded_documents
+add column if not exists extracted_text_preview text;
+
+alter table public.uploaded_documents
+add column if not exists extraction_status text not null default 'not_processed';
+
+alter table public.uploaded_documents
+add column if not exists extracted_at timestamptz;
+
+create table if not exists public.document_chunks (
+  id uuid primary key default gen_random_uuid(),
+  document_id uuid not null references public.uploaded_documents(id) on delete cascade,
+  project_id uuid not null references public.projects(id) on delete cascade,
+  chunk_index integer not null,
+  content text not null,
+  content_preview text,
+  token_estimate integer,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists document_chunks_document_id_idx
+on public.document_chunks(document_id);
+
+create index if not exists document_chunks_project_id_idx
+on public.document_chunks(project_id);
+
+create index if not exists document_chunks_content_search_idx
+on public.document_chunks
+using gin (to_tsvector('english', content));
+
+alter table public.ai_reviews
+add column if not exists evidence_notes jsonb not null default '[]'::jsonb;

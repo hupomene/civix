@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { ProjectCard } from "@/components/projects/project-card";
+import { NewProjectModal } from "@/components/projects/new-project-modal";
 
 type ProjectListItem = {
   id: string;
@@ -15,6 +17,10 @@ type ProjectListItem = {
   documents: number;
   openItems: number;
   createdAt: string;
+  jurisdictionId: string | null;
+  jurisdictionName: string | null;
+  projectState: string | null;
+  projectCounty: string | null;
 };
 
 type ProjectsResponse = {
@@ -24,9 +30,14 @@ type ProjectsResponse = {
 };
 
 export default function ProjectsPage() {
+  const router = useRouter();
+
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [deletingProjectId, setDeletingProjectId] = useState<string | null>(null);
+ 
 
   useEffect(() => {
     async function loadProjects() {
@@ -59,6 +70,52 @@ export default function ProjectsPage() {
     loadProjects();
   }, []);
 
+  function handleProjectCreated(project: ProjectListItem) {
+    setProjects((current) => [project, ...current]);
+    router.push(`/projects/${project.id}`);
+  }
+
+  async function handleDeleteProject(projectId: string) {
+    const confirmed = window.confirm(
+      "Delete this project and all related documents, AI reviews, chunks, and storage files?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeletingProjectId(projectId);
+      setError(null);
+
+      const response = await fetch("/api/projects/delete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ projectId }),
+      });
+
+      const data = (await response.json()) as {
+        ok: boolean;
+        deletedProjectId?: string;
+        deletedStorageFiles?: number;
+        error?: string;
+      };
+
+      if (!response.ok || !data.ok) {
+        throw new Error(data.error ?? "Failed to delete project.");
+      }
+
+      setProjects((current) =>
+        current.filter((project) => project.id !== projectId)
+      );
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Failed to delete project."
+      );
+    } finally {
+      setDeletingProjectId(null);
+    }
+  }
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
       <div className="flex">
@@ -81,7 +138,11 @@ export default function ProjectsPage() {
                 </p>
               </div>
 
-              <button className="rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20">
+              <button
+                type="button"
+                onClick={() => setModalOpen(true)}
+                className="rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01]"
+              >
                 New Project
               </button>
             </div>
@@ -104,20 +165,39 @@ export default function ProjectsPage() {
                   No projects found
                 </h3>
                 <p className="mt-2 text-sm text-slate-500">
-                  Run the demo AI analysis first to create the Lake Dallas
-                  project in Supabase.
+                  Create your first CIVIX construction project workspace.
                 </p>
+
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(true)}
+                  className="mt-6 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition hover:scale-[1.01]"
+                >
+                  Create Project
+                </button>
               </div>
             ) : (
               <div className="grid gap-6 lg:grid-cols-3">
                 {projects.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onDeleteProject={handleDeleteProject}
+                    deletingProjectId={deletingProjectId}
+                  />
                 ))}
               </div>
             )}
           </div>
         </section>
       </div>
+
+      <NewProjectModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onProjectCreated={handleProjectCreated}
+      />
     </main>
   );
 }
+

@@ -173,5 +173,9 @@ export function mockAnalyzeDesignChange({
     affectedDocuments: Array.from(affectedDocuments),
     risks,
     checklist: Array.from(checklist),
+    evidenceNotes: [
+      "Mock review generated from design change keywords and uploaded document metadata.",
+      "Professional validation is required before using this review for permit decisions.",
+    ],
   };
 }

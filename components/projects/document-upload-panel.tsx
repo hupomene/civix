@@ -1,5 +1,6 @@
 import type { UploadedDocument } from "@/types/ai-review";
 import {
+  ExternalLink,
   FileCheck2,
   FileText,
   Trash2,
@@ -10,6 +11,8 @@ type DocumentUploadPanelProps = {
   documents: UploadedDocument[];
   onAddDocuments: (files: FileList | null) => void;
   onRemoveDocument: (documentId: string) => void;
+  isUploading?: boolean;
+  deletingDocumentId?: string | null;
 };
 
 function formatFileSize(size: number) {
@@ -30,7 +33,38 @@ export function DocumentUploadPanel({
   documents,
   onAddDocuments,
   onRemoveDocument,
+  isUploading = false,
+  deletingDocumentId = null,
 }: DocumentUploadPanelProps) {
+  async function handleOpenDocument(documentId: string) {
+    try {
+      const response = await fetch("/api/documents/download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ documentId }),
+      });
+
+      const data = (await response.json()) as {
+        ok: boolean;
+        signedUrl?: string;
+        documentName?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !data.ok || !data.signedUrl) {
+        throw new Error(data.error ?? "Failed to open document.");
+      }
+
+      window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error(error);
+      window.alert(
+        error instanceof Error ? error.message : "Failed to open document."
+      );
+    }
+  }
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex items-center gap-3">
@@ -54,6 +88,7 @@ export function DocumentUploadPanel({
           multiple
           accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
           className="hidden"
+          disabled={isUploading}
           onChange={(event) => {
             onAddDocuments(event.target.files);
             event.target.value = "";
@@ -70,7 +105,7 @@ export function DocumentUploadPanel({
         </p>
 
         <div className="mt-5 inline-flex rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">
-          Select Files
+          {isUploading ? "Uploading..." : "Select Files"}
         </div>
       </label>
 
@@ -107,6 +142,11 @@ export function DocumentUploadPanel({
                   </p>
                   <p className="mt-0.5 text-xs text-slate-500">
                     {formatFileType(file.type)} · {formatFileSize(file.size)}
+                    {file.extractionStatus && (
+                      <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">
+                        Text: {file.extractionStatus}
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -116,11 +156,26 @@ export function DocumentUploadPanel({
 
                 <button
                   type="button"
+                  onClick={() => handleOpenDocument(file.id)}
+                  disabled={!file.storagePath}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-label={`Open ${file.name}`}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => onRemoveDocument(file.id)}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                  disabled={deletingDocumentId === file.id}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={`Remove ${file.name}`}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  {deletingDocumentId === file.id ? (
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-red-500" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>

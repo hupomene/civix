@@ -1,8 +1,11 @@
+import { useState } from "react";
 import type { AIReviewResult } from "@/types/ai-review";
 import {
   AlertTriangle,
   BadgeCheck,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   FileSearch,
   Loader2,
   ShieldAlert,
@@ -20,6 +23,8 @@ export function AIReviewPanel({
   isAnalyzing,
   lastAnalyzedChange,
 }: AIReviewPanelProps) {
+  const [showEvidenceNotes, setShowEvidenceNotes] = useState(false);
+
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
@@ -136,6 +141,54 @@ export function AIReviewPanel({
           </div>
         </div>
       </div>
+
+      {result.evidenceNotes && result.evidenceNotes.length > 0 && (
+        <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50">
+          <button
+            type="button"
+            onClick={() => setShowEvidenceNotes((current) => !current)}
+            className="flex w-full items-center justify-between gap-4 p-5 text-left"
+          >
+            <div>
+              <h3 className="text-sm font-semibold text-blue-950">
+                Evidence Notes
+              </h3>
+              <p className="mt-1 text-xs text-blue-700">
+                {result.evidenceNotes.length} document-based evidence note
+                {result.evidenceNotes.length === 1 ? "" : "s"} generated.
+              </p>
+            </div>
+
+            <span className="inline-flex items-center rounded-xl bg-white px-3 py-2 text-xs font-semibold text-blue-700">
+              {showEvidenceNotes ? (
+                <>
+                  <ChevronDown className="mr-1.5 h-4 w-4" />
+                  Hide
+                </>
+              ) : (
+                <>
+                  <ChevronRight className="mr-1.5 h-4 w-4" />
+                  Show
+                </>
+              )}
+            </span>
+          </button>
+
+          {showEvidenceNotes && (
+            <ol className="border-t border-blue-100 px-5 pb-5 pt-4">
+              {result.evidenceNotes.map((note, index) => (
+                <li
+                  key={`${note}-${index}`}
+                  className="text-sm leading-6 text-blue-900"
+                >
+                  {index + 1}. {note}
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}      
+
     </div>
   );
 }

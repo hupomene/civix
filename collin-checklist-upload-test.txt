@@ -1,0 +1,20 @@
+﻿Collin County Commercial Tenant Improvement Checklist - CIVIX Upload Test
+
+This is a test jurisdiction checklist document for CIVIX development.
+
+Commercial tenant improvement projects may require updated plan sheets when the approved layout changes.
+
+Revision Review Triggers:
+- Restroom relocation may require updated architectural, accessibility, plumbing, mechanical, and electrical sheets.
+- Interior partition relocation may require review of egress paths, corridor widths, lighting, receptacles, and mechanical diffuser coordination.
+- New exterior doors may require review of landing, threshold, door hardware, exterior lighting, drainage, fire access, and exit discharge conditions.
+- Multi-discipline changes should be submitted as a coordinated revision package.
+
+Accessibility Review:
+Restroom relocation should be reviewed for accessible route continuity, turning space, clear floor space, door maneuvering clearance, lavatory clearance, and threshold conditions.
+
+Life Safety Review:
+New doors and wall changes should be reviewed for exit access travel distance, egress width, exit signage, emergency lighting, door swing, occupant load path, and exit discharge coordination.
+
+MEP Review:
+Restroom relocation may affect sanitary routing, vent routing, domestic water, cleanout access, exhaust fan location, lighting, switches, receptacles, and fixture schedules.

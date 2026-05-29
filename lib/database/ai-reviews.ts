@@ -1,5 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { AIReviewResult, UploadedDocument } from "@/types/ai-review";
+import type {
+  AIReviewResult,
+  RetrievedDocumentChunk,
+  RetrievedJurisdictionChunk,
+  UploadedDocument,
+} from "@/types/ai-review";
 import type { Database } from "@/types/database";
 
 type UploadedDocumentInsert =
@@ -11,6 +16,8 @@ type SaveAIReviewInput = {
   result: AIReviewResult;
   documents: UploadedDocument[];
   modelUsed: string;
+  retrievedPermitChunks?: RetrievedDocumentChunk[];
+  retrievedJurisdictionChunks?: RetrievedJurisdictionChunk[];
 };
 
 async function upsertUploadedDocumentMetadata({
@@ -65,6 +72,8 @@ export async function saveAIReview({
   result,
   documents,
   modelUsed,
+  retrievedPermitChunks = [],
+  retrievedJurisdictionChunks = [],
 }: SaveAIReviewInput) {
   const supabase = createAdminClient();
 
@@ -77,8 +86,11 @@ export async function saveAIReview({
       affected_documents: result.affectedDocuments,
       risks: result.risks,
       checklist: result.checklist,
+      evidence_notes: result.evidenceNotes ?? [],
       model_used: modelUsed,
-    })
+      retrieved_permit_chunks: retrievedPermitChunks,
+      retrieved_jurisdiction_chunks: retrievedJurisdictionChunks,
+    } as any)
     .select("*")
     .single();
 

@@ -1,0 +1,154 @@
+import { NextResponse } from "next/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+type CreateProjectRequest = {
+  name: string;
+  location?: string;
+  projectType?: string;
+  jurisdictionId?: string | null;
+  projectState?: string | null;
+  projectCounty?: string | null;
+};
+
+type CreatedProjectRow = {
+  id: string;
+  name: string;
+  location: string | null;
+  project_type: string | null;
+  status: string;
+  risk_level: string;
+  created_at: string;
+  jurisdiction_id: string | null;
+  project_state: string | null;
+  project_county: string | null;
+};
+
+type JurisdictionRow = {
+  id: string;
+  name: string;
+  state: string;
+  county: string | null;
+  city: string | null;
+  jurisdiction_type: string;
+};
+
+function normalizeText(value: string | null | undefined) {
+  return value?.toLowerCase().trim() ?? "";
+}
+
+function findMatchingJurisdiction(
+  projectLocation: string | null | undefined,
+  jurisdictions: JurisdictionRow[]
+) {
+  const normalizedLocation = normalizeText(projectLocation);
+
+  if (!normalizedLocation) {
+    return null;
+  }
+
+  return (
+    jurisdictions.find((jurisdiction) =>
+      normalizedLocation.includes(normalizeText(jurisdiction.name))
+    ) ??
+    jurisdictions.find(
+      (jurisdiction) =>
+        jurisdiction.county &&
+        normalizedLocation.includes(normalizeText(jurisdiction.county))
+    ) ??
+    jurisdictions.find(
+      (jurisdiction) =>
+        jurisdiction.city &&
+        normalizedLocation.includes(normalizeText(jurisdiction.city))
+    ) ??
+    null
+  );
+}
+
+export async function POST(request: Request) {
+  try {
+    const body = (await request.json()) as CreateProjectRequest;
+
+    if (!body.name || body.name.trim().length < 2) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Project name is required.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createAdminClient();
+
+    let resolvedJurisdictionId = body.jurisdictionId ?? null;
+
+    if (!resolvedJurisdictionId && body.location?.trim()) {
+      const { data: jurisdictions, error: jurisdictionsError } = await supabase
+        .from("jurisdictions")
+        .select("id, name, state, county, city, jurisdiction_type")
+        .eq("is_active", true);
+
+      if (jurisdictionsError) {
+        throw new Error(jurisdictionsError.message);
+      }
+
+      const matchedJurisdiction = findMatchingJurisdiction(
+        body.location,
+        (jurisdictions ?? []) as JurisdictionRow[]
+      );
+
+      resolvedJurisdictionId = matchedJurisdiction?.id ?? null;
+    }
+
+    const { data: project, error } = await supabase
+      .from("projects")
+      .insert({
+        name: body.name.trim(),
+        location: body.location?.trim() || null,
+        project_type: body.projectType?.trim() || "Construction Project",
+        jurisdiction_id: resolvedJurisdictionId,
+        project_state: body.projectState?.trim() || null,
+        project_county: body.projectCounty?.trim() || null,
+        status: "Permit Review",
+        risk_level: "Medium",
+      } as any)
+      .select("*")
+      .single();
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const createdProject = project as CreatedProjectRow;
+
+    return NextResponse.json({
+      ok: true,
+      project: {
+        id: createdProject.id,
+        name: createdProject.name,
+        location: createdProject.location ?? "No location provided",
+        type: createdProject.project_type ?? "Construction Project",
+        status: createdProject.status,
+        risk: createdProject.risk_level as "Low" | "Medium" | "High",
+        documents: 0,
+        openItems: 0,
+        createdAt: createdProject.created_at,
+        jurisdictionId: createdProject.jurisdiction_id ?? null,
+        jurisdictionName: null,
+        projectState: createdProject.project_state ?? null,
+        projectCounty: createdProject.project_county ?? null,
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Failed to create project.",
+      },
+      { status: 500 }
+    );
+  }
+}

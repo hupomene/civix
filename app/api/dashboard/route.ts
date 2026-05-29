@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+type DashboardReviewRiskRow = {
+  risks: unknown;
+};
+
 export async function GET() {
   try {
     const supabase = createAdminClient();
@@ -44,11 +48,13 @@ export async function GET() {
     if (recentProjectsResult.error)
       throw new Error(recentProjectsResult.error.message);
 
-    const openRisks =
-      risksResult.data?.reduce((total, review) => {
-        if (!Array.isArray(review.risks)) return total;
-        return total + review.risks.length;
-      }, 0) ?? 0;
+    const riskRows = (risksResult.data ?? []) as unknown as DashboardReviewRiskRow[];
+
+    const openRisks = riskRows.reduce((total, review) => {
+      if (!Array.isArray(review.risks)) return total;
+
+      return total + review.risks.length;
+    }, 0);
 
     return NextResponse.json({
       ok: true,
