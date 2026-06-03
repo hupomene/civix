@@ -833,8 +833,12 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
           designChange={lastAnalyzedChange}
           documents={documents}
           result={reviewResult}
-          retrievedChunks={retrievedChunks}
-          jurisdictionChunks={jurisdictionChunks}
+          retrievedChunks={
+            isDeveloperMode && showDeveloperEvidence ? retrievedChunks : []
+          }
+          jurisdictionChunks={
+            isDeveloperMode && showDeveloperEvidence ? jurisdictionChunks : []
+          }
         />
       </section>
     </div>
