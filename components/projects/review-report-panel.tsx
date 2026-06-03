@@ -501,15 +501,21 @@ function handlePrintReport() {
 
           ${additionalEvidenceHtml}
 
-          <h2>Retrieved Permit Package Source Chunks</h2>
-          <ol>
-            ${permitChunksHtml}
-          </ol>
+          ${
+            retrievedChunks.length > 0 || jurisdictionChunks.length > 0
+              ? `
+                <h2>Retrieved Permit Package Source Chunks</h2>
+                <ol>
+                  ${permitChunksHtml}
+                </ol>
 
-          <h2>Retrieved Jurisdiction Source Chunks</h2>
-          <ol>
-            ${jurisdictionChunksHtml}
-          </ol>
+                <h2>Retrieved Jurisdiction Source Chunks</h2>
+                <ol>
+                  ${jurisdictionChunksHtml}
+                </ol>
+              `
+              : ""
+          }
 
           <div class="notice">
             This report is an AI-generated draft for project coordination and preliminary review support.
@@ -861,75 +867,77 @@ function handlePrintReport() {
           </div>
         )}
 
-        <div className="mt-5 rounded-2xl bg-white p-5 print:rounded-none print:border print:border-slate-200">
-          <h3 className="text-sm font-semibold text-slate-900">
-            Retrieved Source Chunks
-          </h3>
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            Source chunks retrieved by CIVIX to support this AI-assisted permit review.
-          </p>
+        {(retrievedChunks.length > 0 || jurisdictionChunks.length > 0) && (
+          <div className="mt-5 rounded-2xl bg-white p-5 print:rounded-none print:border print:border-slate-200">
+            <h3 className="text-sm font-semibold text-slate-900">
+              Retrieved Source Chunks
+            </h3>
+            <p className="mt-1 text-xs leading-5 text-slate-500">
+              Source chunks retrieved by CIVIX to support this AI-assisted permit review.
+            </p>
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-2 print:grid-cols-1">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 print:rounded-none">
-              <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                Permit Package Chunks
-              </h4>
+            <div className="mt-4 grid gap-4 lg:grid-cols-2 print:grid-cols-1">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 print:rounded-none">
+                <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  Permit Package Chunks
+                </h4>
 
-              <div className="mt-3 space-y-3">
-                {retrievedChunks.length > 0 ? (
-                  retrievedChunks.slice(0, 5).map((chunk, index) => (
-                    <div
-                      key={`${chunk.documentName}-${chunk.chunkIndex}-${index}`}
-                      className="rounded-xl bg-white p-3 text-xs leading-5 text-slate-700 print:rounded-none"
-                    >
-                      <p className="font-semibold text-slate-900">
-                        {chunk.documentName}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Chunk #{chunk.chunkIndex} · Score {chunk.relevanceScore}
-                      </p>
-                      <p className="mt-2">{chunk.contentPreview}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-slate-500">
-                    No permit package chunks were attached.
-                  </p>
-                )}
+                <div className="mt-3 space-y-3">
+                  {retrievedChunks.length > 0 ? (
+                    retrievedChunks.slice(0, 5).map((chunk, index) => (
+                      <div
+                        key={`${chunk.documentName}-${chunk.chunkIndex}-${index}`}
+                        className="rounded-xl bg-white p-3 text-xs leading-5 text-slate-700 print:rounded-none"
+                      >
+                        <p className="font-semibold text-slate-900">
+                          {chunk.documentName}
+                        </p>
+                        <p className="mt-1 text-slate-500">
+                          Chunk #{chunk.chunkIndex} · Score {chunk.relevanceScore}
+                        </p>
+                        <p className="mt-2">{chunk.contentPreview}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      No permit package chunks were attached.
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 print:rounded-none">
-              <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
-                Jurisdiction Chunks
-              </h4>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 print:rounded-none">
+                <h4 className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                  Jurisdiction Chunks
+                </h4>
 
-              <div className="mt-3 space-y-3">
-                {jurisdictionChunks.length > 0 ? (
-                  jurisdictionChunks.slice(0, 5).map((chunk) => (
-                    <div
-                      key={chunk.id}
-                      className="rounded-xl bg-white p-3 text-xs leading-5 text-slate-700 print:rounded-none"
-                    >
-                      <p className="font-semibold text-slate-900">
-                        {chunk.jurisdictionName}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        {chunk.documentType} · Chunk #{chunk.chunkIndex} · Score{" "}
-                        {chunk.relevanceScore}
-                      </p>
-                      <p className="mt-2">{truncateSourceText(chunk.content)}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-slate-500">
-                    No jurisdiction chunks were attached.
-                  </p>
-                )}
+                <div className="mt-3 space-y-3">
+                  {jurisdictionChunks.length > 0 ? (
+                    jurisdictionChunks.slice(0, 5).map((chunk) => (
+                      <div
+                        key={chunk.id}
+                        className="rounded-xl bg-white p-3 text-xs leading-5 text-slate-700 print:rounded-none"
+                      >
+                        <p className="font-semibold text-slate-900">
+                          {chunk.jurisdictionName}
+                        </p>
+                        <p className="mt-1 text-slate-500">
+                          {chunk.documentType} · Chunk #{chunk.chunkIndex} · Score{" "}
+                          {chunk.relevanceScore}
+                        </p>
+                        <p className="mt-2">{truncateSourceText(chunk.content)}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-slate-500">
+                      No jurisdiction chunks were attached.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="mt-5 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 print:rounded-none">
           <ShieldAlert className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
