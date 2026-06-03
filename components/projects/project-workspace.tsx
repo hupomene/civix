@@ -143,6 +143,9 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
     RetrievedJurisdictionChunk[]
   >([]);
 
+  const [isDeveloperMode, setIsDeveloperMode] = useState(false);
+  const [showDeveloperEvidence, setShowDeveloperEvidence] = useState(false);
+
   const [reviewHistory, setReviewHistory] = useState<AIReviewHistoryItem[]>([]);
   const [isLoadingReviewHistory, setIsLoadingReviewHistory] = useState(false);
   const [deletingReviewId, setDeletingReviewId] = useState<string | null>(null);
@@ -153,6 +156,14 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
     null
   );
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const devMode =
+      params.get("dev") === "1" || params.get("debug") === "1";
+
+    setIsDeveloperMode(devMode);
+  }, []);
+  
   function safeArray<T>(value: unknown): T[] {
     return Array.isArray(value) ? (value as T[]) : [];
   }
@@ -738,8 +749,36 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
 
           <ComplianceChecklist checklist={reviewResult.checklist} />
 
-          <RetrievedChunksPanel chunks={retrievedChunks} />
-          <JurisdictionEvidencePanel chunks={jurisdictionChunks} />
+          {isDeveloperMode && (
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 text-sm shadow-sm">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-semibold text-slate-900">
+                    Developer Evidence View
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Retrieved permit and jurisdiction chunks are hidden from regular demo
+                    users. Use this section only for internal validation.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowDeveloperEvidence((current) => !current)}
+                  className="rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  {showDeveloperEvidence ? "Hide Evidence" : "Show Evidence"}
+                </button>
+              </div>
+
+              {showDeveloperEvidence && (
+                <div className="mt-5 space-y-5">
+                  <RetrievedChunksPanel chunks={retrievedChunks} />
+                  <JurisdictionEvidencePanel chunks={jurisdictionChunks} />
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="rounded-3xl border border-indigo-100 bg-indigo-50 p-5 text-sm shadow-sm">
             <p className="font-semibold text-indigo-900">
