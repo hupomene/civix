@@ -39,13 +39,6 @@ export function ComplianceChecklist({ checklist }: ComplianceChecklistProps) {
         ))}
       </div>
 
-      <div className="mt-6 flex items-center gap-3 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
-        <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
-        <p>
-          This checklist now updates based on the design change input. The next
-          step is to replace this mock logic with the OpenAI API route.
-        </p>
-      </div>
     </div>
   );
 }
