@@ -691,8 +691,8 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
         </div>
       </section>
 
-      <section className="grid min-w-0 gap-6 xl:grid-cols-2">
-        <div className="min-w-0 space-y-6">
+      <section className="grid min-w-0 gap-5">
+        <div className="min-w-0 space-y-5">
           <DocumentUploadPanel
             documents={documents}
             onAddDocuments={handleAddDocuments}
@@ -729,7 +729,7 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
           />
         </div>
 
-        <div className="min-w-0 space-y-6">
+        <div className="min-w-0 space-y-5">
           <AIReviewPanel
             result={reviewResult}
             isAnalyzing={isAnalyzing}
