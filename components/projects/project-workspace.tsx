@@ -586,36 +586,14 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
               </div>
             </div>
 
-            <p className="mt-5 max-w-3xl text-sm leading-6 text-slate-600">
-              This workspace demonstrates the core CIVIX MVP workflow: upload an
-              existing permit package, describe a design change, and generate an
-              AI-assisted impact summary with affected documents and compliance
-              checklist items.
-            </p>
 
             {analysisError && (
               <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
                 {analysisError}
               </div>
             )}
-            {savedReviewId && (
-              <div className="mt-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-                AI review saved to Supabase successfully.
-                <span className="ml-2 font-mono text-xs text-emerald-700">
-                  Review ID: {savedReviewId}
-                </span>
-                {modelUsed && (
-                  <span className="ml-2 rounded-full bg-white px-2 py-1 text-xs font-semibold text-emerald-700">
-                    {modelUsed}
-                  </span>
-                )}
-              </div>
-            )}
-            {workspaceLoadedFromDb && !isLoadingWorkspace && (
-              <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
-                Latest project workspace data loaded from Supabase.
-              </div>
-            )}
+            
+            
           </div>
 
           <div className="grid min-w-full gap-3 sm:grid-cols-5 lg:min-w-[820px]">
