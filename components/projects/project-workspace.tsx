@@ -780,23 +780,27 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
             </div>
           )}
 
-          <div className="rounded-3xl border border-indigo-100 bg-indigo-50 p-5 text-sm shadow-sm">
-            <p className="font-semibold text-indigo-900">
-              Matched Jurisdiction Pack
-            </p>
-            <p className="mt-1 text-indigo-700">
-              {selectedJurisdictionName ?? "No matching jurisdiction pack found"}
-            </p>
-          </div>
-
-          {selectedJurisdictionId ? (
-            <JurisdictionDocumentsPanel
-              jurisdictionId={selectedJurisdictionId}
-            />
-          ) : (
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
-              No matching jurisdiction pack was found for this project location.
+          {isDeveloperMode && (
+            <div className="rounded-3xl border border-indigo-100 bg-indigo-50 p-5 text-sm shadow-sm">
+              <p className="font-semibold text-indigo-900">
+                Matched Jurisdiction Pack
+              </p>
+              <p className="mt-1 text-indigo-700">
+                {selectedJurisdictionName ?? "No matching jurisdiction pack found"}
+              </p>
             </div>
+          )}
+
+          {isDeveloperMode && (
+            selectedJurisdictionId ? (
+              <JurisdictionDocumentsPanel
+                jurisdictionId={selectedJurisdictionId}
+              />
+            ) : (
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
+                No matching jurisdiction pack was found for this project location.
+              </div>
+            )
           )}
 
           <ReviewHistoryPanel
