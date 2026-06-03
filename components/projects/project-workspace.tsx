@@ -562,17 +562,17 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
     : "Low";
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-start">
-          <div>
+    <div className="max-w-full space-y-6 overflow-x-hidden">
+      <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex min-w-0 flex-col justify-between gap-4 lg:flex-row lg:items-start">
+          <div className="min-w-0">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
                 <Building2 className="h-6 w-6 text-blue-600" />
               </div>
 
               <div>
-                <h2 className="text-2xl font-semibold tracking-tight">
+                <h2 className="break-words text-2xl font-semibold leading-tight tracking-tight">
                   {projectName}
                 </h2>
 
@@ -596,8 +596,8 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
             
           </div>
 
-          <div className="grid min-w-full gap-3 sm:grid-cols-5 lg:min-w-[820px]">
-            <div className="rounded-2xl bg-slate-50 p-4">
+          <div className="grid w-full min-w-0 grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="rounded-2xl bg-slate-50 p-3">
               <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
                 <CalendarDays className="h-4 w-4" />
                 Review Date
@@ -605,7 +605,7 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
               <p className="mt-2 font-semibold">May 23, 2026</p>
             </div>
 
-            <div className="rounded-2xl bg-blue-50 p-4">
+            <div className="rounded-2xl bg-blue-50 p-3">
               <div className="flex items-center gap-2 text-xs font-medium text-blue-700">
                 <FileText className="h-4 w-4" />
                 Documents
@@ -616,7 +616,7 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
             </div>
 
             <div
-              className={`rounded-2xl p-4 ${
+              className={`rounded-2xl p-3 ${
                 selectedJurisdictionName ? "bg-indigo-50" : "bg-slate-50"
               }`}
             >
@@ -641,7 +641,7 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
             </div>
 
             <div
-              className={`rounded-2xl p-4 ${
+              className={`rounded-2xl p-3 ${
                 highestRisk === "High"
                   ? "bg-red-50"
                   : highestRisk === "Medium"
@@ -674,7 +674,7 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
               </p>
             </div>
 
-            <div className="rounded-2xl bg-emerald-50 p-4">
+            <div className="rounded-2xl bg-emerald-50 p-3">
               <div className="flex items-center gap-2 text-xs font-medium text-emerald-700">
                 <ClipboardCheck className="h-4 w-4" />
                 Status
@@ -691,8 +691,8 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-6">
+      <section className="grid min-w-0 gap-6 xl:grid-cols-2">
+        <div className="min-w-0 space-y-6">
           <DocumentUploadPanel
             documents={documents}
             onAddDocuments={handleAddDocuments}
@@ -729,7 +729,7 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
           />
         </div>
 
-        <div className="space-y-6">
+        <div className="min-w-0 space-y-6">
           <AIReviewPanel
             result={reviewResult}
             isAnalyzing={isAnalyzing}
