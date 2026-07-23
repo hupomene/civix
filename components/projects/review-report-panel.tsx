@@ -23,6 +23,7 @@ type ReviewReportPanelProps = {
   designChange: string;
   documents: UploadedDocument[];
   result: AIReviewResult;
+  jurisdictionPackName?: string | null;
   retrievedChunks?: RetrievedDocumentChunk[];
   jurisdictionChunks?: RetrievedJurisdictionChunk[];
 };
@@ -34,6 +35,7 @@ function formatReportText({
   designChange,
   documents,
   result,
+  jurisdictionPackName,
   retrievedChunks = [],
   jurisdictionChunks = [],
 }: ReviewReportPanelProps) {
@@ -117,7 +119,9 @@ Project Name: ${projectName}
 Location: ${projectLocation}
 Project Type: ${projectType}
 Jurisdiction Pack Used: ${
-  jurisdictionChunks[0]?.jurisdictionName ?? "No jurisdiction pack used"
+  jurisdictionPackName ??
+  jurisdictionChunks[0]?.jurisdictionName ??
+  "No jurisdiction pack used"
 }
 
 Design Change Reviewed
@@ -206,14 +210,17 @@ export function ReviewReportPanel({
   designChange,
   documents,
   result,
+  jurisdictionPackName,
   retrievedChunks = [],
   jurisdictionChunks = [],
 }: ReviewReportPanelProps) {
   const [copied, setCopied] = useState(false);
 
   const highestRisk = getHighestRisk(result);
-  const jurisdictionPackName =
-    jurisdictionChunks[0]?.jurisdictionName ?? "No jurisdiction pack used";
+  const resolvedJurisdictionPackName =
+    jurisdictionPackName ??
+    jurisdictionChunks[0]?.jurisdictionName ??
+    "No jurisdiction pack used";
 
   const {
     permitPackageEvidenceNotes,
@@ -230,6 +237,7 @@ export function ReviewReportPanel({
         designChange,
         documents,
         result,
+        jurisdictionPackName: resolvedJurisdictionPackName,
         retrievedChunks,
         jurisdictionChunks,
       }),
@@ -240,6 +248,7 @@ export function ReviewReportPanel({
       designChange,
       documents,
       result,
+      resolvedJurisdictionPackName,
       retrievedChunks,
       jurisdictionChunks,
     ]
@@ -447,7 +456,7 @@ function handlePrintReport() {
 
             <div class="meta-card">
               <div class="label">Jurisdiction Pack Used</div>
-              <div class="value">${jurisdictionPackName}</div>
+              <div class="value">${resolvedJurisdictionPackName}</div>
               <p>County/city source evidence used for this analysis</p>
             </div>
           </div>
@@ -644,7 +653,7 @@ function handlePrintReport() {
               Jurisdiction Pack Used
             </p>
             <p className="mt-2 text-sm font-semibold text-slate-900">
-              {jurisdictionPackName}
+              {resolvedJurisdictionPackName}
             </p>
             <p className="mt-1 text-sm text-slate-500">
               County/city evidence source

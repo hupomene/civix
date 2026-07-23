@@ -860,6 +860,7 @@ function findMatchingJurisdiction(
           designChange={lastAnalyzedChange}
           documents={documents}
           result={reviewResult}
+          jurisdictionPackName={selectedJurisdictionName}
           retrievedChunks={
             isDeveloperMode && showDeveloperEvidence ? retrievedChunks : []
           }
