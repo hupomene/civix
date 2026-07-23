@@ -163,22 +163,37 @@ function findMatchingJurisdiction(
     return null;
   }
 
-  return (
-    jurisdictions.find((jurisdiction) =>
-      normalizedLocation.includes(normalizeText(jurisdiction.name))
-    ) ??
-    jurisdictions.find(
-      (jurisdiction) =>
-        jurisdiction.county &&
-        normalizedLocation.includes(normalizeText(jurisdiction.county))
-    ) ??
-    jurisdictions.find(
-      (jurisdiction) =>
-        jurisdiction.city &&
-        normalizedLocation.includes(normalizeText(jurisdiction.city))
-    ) ??
-    null
+  const cityMatch = jurisdictions.find(
+    (jurisdiction) =>
+      jurisdiction.city &&
+      normalizedLocation.includes(normalizeText(jurisdiction.city)) &&
+      normalizeText(jurisdiction.jurisdiction_type) === "city"
   );
+
+  if (cityMatch) {
+    return cityMatch;
+  }
+
+  const nameMatch = jurisdictions.find((jurisdiction) =>
+    normalizedLocation.includes(normalizeText(jurisdiction.name))
+  );
+
+  if (nameMatch) {
+    return nameMatch;
+  }
+
+  const countyMatch = jurisdictions.find(
+    (jurisdiction) =>
+      jurisdiction.county &&
+      normalizedLocation.includes(normalizeText(jurisdiction.county)) &&
+      normalizeText(jurisdiction.jurisdiction_type) === "county"
+  );
+
+  if (countyMatch) {
+    return countyMatch;
+  }
+
+  return null;
 }
 
 export async function getRelevantJurisdictionChunks({

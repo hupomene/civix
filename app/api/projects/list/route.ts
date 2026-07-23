@@ -11,6 +11,7 @@ type ProjectListRow = {
   jurisdiction_id: string | null;
   project_state: string | null;
   project_county: string | null;
+  project_city: string | null;
   jurisdictions:
     | {
         id: string;
@@ -113,6 +114,7 @@ export async function GET() {
         jurisdictionName: jurisdiction?.name ?? null,
         projectState: project.project_state ?? null,
         projectCounty: project.project_county ?? null,
+        projectCity: project.project_city ?? null,
       };
     });
 

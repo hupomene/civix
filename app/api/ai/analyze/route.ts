@@ -210,8 +210,7 @@ export async function POST(request: Request) {
       savedReviewId = savedReview.id;
       savedProjectId = projectForAnalyze.id;
 
-      savedReviewId = savedReview.id;
-      savedProjectId = projectForAnalyze.id;
+    
     } catch (dbError) {
       console.error("Supabase save failed:", dbError);
     }

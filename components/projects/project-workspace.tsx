@@ -168,29 +168,52 @@ export function ProjectWorkspace({ projectId }: ProjectWorkspaceProps) {
     return Array.isArray(value) ? (value as T[]) : [];
   }
 
-  function findMatchingJurisdiction(
-    projectLocation: string,
-    jurisdictions: JurisdictionListItem[]
-  ) {
-    const normalizedLocation = projectLocation.toLowerCase();
+  function normalizeText(value: string | null | undefined) {
+  return value?.toLowerCase().trim() ?? "";
+}
 
-    return (
-      jurisdictions.find((jurisdiction) =>
-        normalizedLocation.includes(jurisdiction.name.toLowerCase())
-      ) ??
-      jurisdictions.find(
-        (jurisdiction) =>
-          jurisdiction.county &&
-          normalizedLocation.includes(jurisdiction.county.toLowerCase())
-      ) ??
-      jurisdictions.find(
-        (jurisdiction) =>
-          jurisdiction.city &&
-          normalizedLocation.includes(jurisdiction.city.toLowerCase())
-      ) ??
-      null
-    );
+function findMatchingJurisdiction(
+  projectLocation: string,
+  jurisdictions: JurisdictionListItem[]
+) {
+  const normalizedLocation = normalizeText(projectLocation);
+
+  if (!normalizedLocation) {
+    return null;
   }
+
+  const cityMatch = jurisdictions.find(
+    (jurisdiction) =>
+      jurisdiction.city &&
+      normalizedLocation.includes(normalizeText(jurisdiction.city)) &&
+      normalizeText(jurisdiction.jurisdiction_type) === "city"
+  );
+
+  if (cityMatch) {
+    return cityMatch;
+  }
+
+  const nameMatch = jurisdictions.find((jurisdiction) =>
+    normalizedLocation.includes(normalizeText(jurisdiction.name))
+  );
+
+  if (nameMatch) {
+    return nameMatch;
+  }
+
+  const countyMatch = jurisdictions.find(
+    (jurisdiction) =>
+      jurisdiction.county &&
+      normalizedLocation.includes(normalizeText(jurisdiction.county)) &&
+      normalizeText(jurisdiction.jurisdiction_type) === "county"
+  );
+
+  if (countyMatch) {
+    return countyMatch;
+  }
+
+  return null;
+}
 
   function convertReviewHistoryItemToResult(
     review: AIReviewHistoryItem

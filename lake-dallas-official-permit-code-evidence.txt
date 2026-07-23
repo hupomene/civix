@@ -1,0 +1,83 @@
+﻿Lake Dallas, TX Official Permit and Building Code Evidence
+
+Source 1: Lake Dallas Permits Page
+Official URL: https://www.lakedallas.com/665/Permits
+
+The City of Lake Dallas Development Services Department receives, reviews, and issues most of the City's permits for both commercial and residential properties.
+
+Structural alterations, additions, remodels, and work involving mechanical, plumbing, or electrical elements cannot be conducted without a permit issued by the City.
+
+All permits are processed by the City's Permit Technician.
+
+Any work commencing before a permit is issued is subject to permit fees being doubled.
+
+Fire-related permits and inspections are processed by the Lake Cities Fire Department.
+
+All contractors performing work are required to register with the City of Lake Dallas and provide required documentation.
+
+Commercial Building Permits include structural alterations, additions, repairs, and remodels.
+
+Source 2: Lake Dallas Building and Municipal Codes Page
+Official URL: https://www.lakedallas.com/229/Building-Municipal-Codes
+
+The City of Lake Dallas has adopted the Lake Dallas Municipal Code and International Building Code to establish minimum requirements to safeguard public health, safety, and general welfare.
+
+Effective May 23, 2019, Lake Dallas adopted the following codes:
+- International Building Code, 2018 Edition
+- International Energy Conservation Code, 2018 Edition
+- International Fire Code, 2018 Edition
+- International Fuel Gas Code, 2018 Edition
+- International Mechanical Code, 2018 Edition
+- International Plumbing Code, 2018 Edition
+- International Residential Code, 2018 Edition
+- National Electrical Code, 2017 Edition, including NCTCOG and Lake Cities Fire Department amendments
+
+The City's adopted codes address:
+- Adequate light and ventilation
+- Egress facilities
+- Energy conservation
+- Safety to life and property from fire and other hazards
+- Sanitation
+- Stability
+- Structural strength
+
+The City of Lake Dallas requires building permits when construction work is performed within City limits.
+
+Source 3: Lake Dallas Development Services Page
+Official URL: https://lakedallas.com/160/Development-Services
+
+The Development Services Department supports responsible growth and development within the City of Lake Dallas.
+
+The department assists with:
+- Planning and Zoning
+- Plats
+- Permits
+- Variances
+- Code Compliance
+- Residential inspections
+- Commercial inspections
+- Health inspections
+
+CIVIX Interpretation for Permit Review
+
+For a commercial renovation or remodel project located at 5008 S Stemmons Fwy, Lake Dallas, Texas, CIVIX should treat Lake Dallas, TX as the primary authority having jurisdiction for city permit review.
+
+Potential design changes that involve structural alterations, additions, repairs, remodels, mechanical work, plumbing work, electrical work, exterior doors, egress, accessibility, or fire-related systems should be flagged for possible permit impact.
+
+Potential affected documents may include:
+- Cover sheet
+- Permit application narrative
+- Architectural floor plans
+- Demolition plans
+- Life safety or egress plans
+- Accessibility details
+- Exterior elevations
+- Door schedules
+- Mechanical plans
+- Electrical plans
+- Plumbing plans
+- Energy code documents
+- Contractor registration documents
+- Fire-related permit or inspection documentation, if applicable
+
+CIVIX should note that fire-related permits and inspections may involve the Lake Cities Fire Department and that final applicability must be confirmed with the City of Lake Dallas Development Services Department.

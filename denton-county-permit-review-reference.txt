@@ -1,0 +1,40 @@
+﻿Denton County, TX Permit Review Reference - CIVIX MVP Draft
+
+This jurisdiction reference is used for preliminary CIVIX MVP testing for projects located in Denton County, Texas, including commercial renovation and remodeling projects.
+
+Project location context:
+- Projects in Lake Dallas, Texas may require confirmation of the applicable authority having jurisdiction.
+- The project may involve Denton County, the City of Lake Dallas, fire marshal review, accessibility review, trade permit review, or other local permitting authority review.
+- CIVIX should flag that final permit requirements must be confirmed with the applicable local authority.
+
+General permit review considerations:
+- Confirm the authority having jurisdiction for the project location.
+- Confirm whether the project is reviewed by Denton County, the City of Lake Dallas, or another municipality.
+- Verify applicable building code, fire code, accessibility, zoning, and trade permit requirements.
+- For commercial renovation projects, confirm whether revised drawings, updated scope narrative, and affected trade sheets are required.
+
+Design change review considerations:
+- Changes to floor layout may affect architectural floor plans, egress plans, accessibility details, door schedules, and permit narratives.
+- Changes involving exterior doors may require review of egress, accessibility, exterior elevations, threshold conditions, landing clearances, and door hardware.
+- Changes involving restroom relocation may require review of plumbing plans, fixture locations, accessibility clearances, turning radius, grab bars, and fixture schedules.
+- Changes involving interior walls may require confirmation of whether walls are load-bearing, fire-rated, tenant separation walls, or non-load-bearing partitions.
+- Changes affecting mechanical, electrical, or plumbing systems may require updated MEP sheets and coordination with the permit reviewer.
+- Changes affecting roof-mounted equipment may require review of mechanical plans, structural support, roof penetrations, and equipment schedules.
+
+Potential affected documents:
+- Cover sheet and permit narrative
+- Existing and demolition floor plans
+- Proposed floor plans
+- Exterior elevations
+- Life safety or egress plans
+- Accessibility details
+- Structural plans
+- Mechanical plans
+- Electrical plans
+- Plumbing plans
+- Door schedule
+- Fixture schedule
+- Energy code or envelope documentation, if applicable
+
+MVP limitation:
+This reference is a preliminary Denton County / Lake Dallas testing document for CIVIX. It should be replaced or supplemented with official jurisdiction documents, reviewer comments, adopted code references, and current permitting requirements.

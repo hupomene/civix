@@ -21,6 +21,7 @@ type ProjectListItem = {
   jurisdictionName: string | null;
   projectState: string | null;
   projectCounty: string | null;
+  projectCity: string | null;
 };
 
 type ProjectsResponse = {
@@ -70,9 +71,16 @@ export default function ProjectsPage() {
     loadProjects();
   }, []);
 
-  function handleProjectCreated(project: ProjectListItem) {
-    setProjects((current) => [project, ...current]);
-    router.push(`/projects/${project.id}`);
+  function handleProjectCreated(project: Omit<ProjectListItem, "projectCity"> & {
+    projectCity?: string | null;
+  }) {
+    const normalizedProject: ProjectListItem = {
+      ...project,
+      projectCity: project.projectCity ?? null,
+    };
+
+    setProjects((current) => [normalizedProject, ...current]);
+    router.push(`/projects/${normalizedProject.id}`);
   }
 
   async function handleDeleteProject(projectId: string) {

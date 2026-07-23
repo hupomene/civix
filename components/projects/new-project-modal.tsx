@@ -25,6 +25,7 @@ type NewProjectModalProps = {
     jurisdictionName: string | null;
     projectState: string | null;
     projectCounty: string | null;
+    projectCity: string | null;
   }) => void;
 };
 
@@ -44,6 +45,7 @@ type CreateProjectResponse = {
     jurisdictionName: string | null;
     projectState: string | null;
     projectCounty: string | null;
+    projectCity: string | null;
   };
   error?: string;
 };
@@ -67,17 +69,68 @@ function normalizeText(value: string | null | undefined) {
   return value?.toLowerCase().trim() ?? "";
 }
 
+function normalizeCounty(value: string | null | undefined) {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  return trimmed.toLowerCase().endsWith("county")
+    ? trimmed
+    : `${trimmed} County`;
+}
+
 function findMatchingJurisdiction(
   projectLocation: string,
-  jurisdictions: JurisdictionListItem[]
+  jurisdictions: JurisdictionListItem[],
+  projectState?: string | null,
+  projectCounty?: string | null,
+  projectCity?: string | null
 ) {
   const normalizedLocation = normalizeText(projectLocation);
+  const normalizedState = normalizeText(projectState);
+  const normalizedCounty = normalizeText(normalizeCounty(projectCounty));
+  const normalizedCity = normalizeText(projectCity);
+
+  if (normalizedState && normalizedCounty && normalizedCity) {
+    const cityMatch = jurisdictions.find(
+      (jurisdiction) =>
+        normalizeText(jurisdiction.state) === normalizedState &&
+        normalizeText(jurisdiction.county) === normalizedCounty &&
+        normalizeText(jurisdiction.city) === normalizedCity &&
+        normalizeText(jurisdiction.jurisdiction_type) === "city"
+    );
+
+    if (cityMatch) {
+      return cityMatch;
+    }
+  }
+
+  if (normalizedState && normalizedCounty) {
+    const countyMatch = jurisdictions.find(
+      (jurisdiction) =>
+        normalizeText(jurisdiction.state) === normalizedState &&
+        normalizeText(jurisdiction.county) === normalizedCounty &&
+        normalizeText(jurisdiction.jurisdiction_type) === "county"
+    );
+
+    if (countyMatch) {
+      return countyMatch;
+    }
+  }
 
   if (!normalizedLocation) {
     return null;
   }
 
   return (
+    jurisdictions.find(
+      (jurisdiction) =>
+        jurisdiction.city &&
+        normalizedLocation.includes(normalizeText(jurisdiction.city)) &&
+        normalizeText(jurisdiction.jurisdiction_type) === "city"
+    ) ??
     jurisdictions.find((jurisdiction) =>
       normalizedLocation.includes(normalizeText(jurisdiction.name))
     ) ??
@@ -85,11 +138,6 @@ function findMatchingJurisdiction(
       (jurisdiction) =>
         jurisdiction.county &&
         normalizedLocation.includes(normalizeText(jurisdiction.county))
-    ) ??
-    jurisdictions.find(
-      (jurisdiction) =>
-        jurisdiction.city &&
-        normalizedLocation.includes(normalizeText(jurisdiction.city))
     ) ??
     null
   );
@@ -108,6 +156,7 @@ export function NewProjectModal({
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
 
   const [selectedCounty, setSelectedCounty] = useState("");
+  const [selectedCity, setSelectedCity] = useState("");
   const [countyDropdownOpen, setCountyDropdownOpen] = useState(false);
   const [countySearch, setCountySearch] = useState("");
   const [projectType, setProjectType] = useState("Commercial Renovation");
@@ -141,9 +190,16 @@ export function NewProjectModal({
   }, [open]);
 
   useEffect(() => {
-    const matched = findMatchingJurisdiction(location, jurisdictions);
+    const matched = findMatchingJurisdiction(
+      location,
+      jurisdictions,
+      selectedState,
+      selectedCounty,
+      selectedCity
+    );
+
     setMatchedJurisdiction(matched);
-  }, [location, jurisdictions]); 
+  }, [location, jurisdictions, selectedState, selectedCounty, selectedCity]); 
   
   const filteredStates = US_STATES.filter((state) => {
     const search = stateSearch.toLowerCase().trim();
@@ -171,6 +227,7 @@ export function NewProjectModal({
     setStateDropdownOpen(false);
 
     setSelectedCounty("");
+    setSelectedCity("");
     setCountySearch("");
     setCountyDropdownOpen(false);
     setLocation("");
@@ -182,10 +239,18 @@ export function NewProjectModal({
       return;
     }
 
+    const city = county === "Denton" ? "Lake Dallas" : "";
+    const nextLocation = city
+      ? `${city}, ${county} County, TX`
+      : county
+        ? formatTexasCountyLocation(county)
+        : "";
+
     setSelectedCounty(county);
+    setSelectedCity(city);
     setCountySearch(county ? `${county} County` : "");
     setCountyDropdownOpen(false);
-    setLocation(county ? formatTexasCountyLocation(county) : "");
+    setLocation(nextLocation);
   }
 
   const canCreateProject =
@@ -228,6 +293,7 @@ export function NewProjectModal({
           jurisdictionId: matchedJurisdiction?.id ?? null,
           projectState: selectedState,
           projectCounty: selectedCounty,
+          projectCity: selectedCity || null,
         }),
       });
 
@@ -247,6 +313,7 @@ export function NewProjectModal({
       setStateDropdownOpen(false);
 
       setSelectedCounty("");
+      setSelectedCity("");
       setCountySearch("");
       setCountyDropdownOpen(false);
 
@@ -445,11 +512,23 @@ export function NewProjectModal({
 
               <p className="mt-1 text-xs text-slate-400">
                 {selectedState === "TX"
-                  ? "Location will be saved as county/state."
+                  ? selectedCounty === "Denton"
+                    ? "Lake Dallas city jurisdiction will be used for this Denton County test project."
+                    : "Location will be saved as county/state."
                   : "County data for this state will be added later. Texas counties are currently supported for project creation."}
               </p>
             </div>
           </div>
+
+          {selectedCity && (
+            <div className="rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-800">
+              <p className="font-semibold">City Jurisdiction</p>
+              <p className="mt-1">
+                {selectedCity}, {selectedCounty} County, TX will be used as the
+                primary jurisdiction for this project.
+              </p>
+            </div>
+          )}
 
           {location.trim().length > 0 && (
             <div

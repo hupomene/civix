@@ -23,6 +23,7 @@ type ProjectCardProps = {
     jurisdictionName: string | null;
     projectState: string | null;
     projectCounty: string | null;
+    projectCity: string | null;
   };
   onDeleteProject?: (projectId: string) => void;
   deletingProjectId?: string | null;

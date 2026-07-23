@@ -8,6 +8,7 @@ type CreateProjectRequest = {
   jurisdictionId?: string | null;
   projectState?: string | null;
   projectCounty?: string | null;
+  projectCity?: string | null;
 };
 
 type CreatedProjectRow = {
@@ -21,6 +22,7 @@ type CreatedProjectRow = {
   jurisdiction_id: string | null;
   project_state: string | null;
   project_county: string | null;
+  project_city: string | null;
 };
 
 type JurisdictionRow = {
@@ -36,17 +38,68 @@ function normalizeText(value: string | null | undefined) {
   return value?.toLowerCase().trim() ?? "";
 }
 
+function normalizeCounty(value: string | null | undefined) {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  return trimmed.toLowerCase().endsWith("county")
+    ? trimmed
+    : `${trimmed} County`;
+}
+
 function findMatchingJurisdiction(
   projectLocation: string | null | undefined,
-  jurisdictions: JurisdictionRow[]
+  jurisdictions: JurisdictionRow[],
+  projectState?: string | null,
+  projectCounty?: string | null,
+  projectCity?: string | null
 ) {
   const normalizedLocation = normalizeText(projectLocation);
+  const normalizedState = normalizeText(projectState);
+  const normalizedCounty = normalizeText(normalizeCounty(projectCounty));
+  const normalizedCity = normalizeText(projectCity);
+
+  if (normalizedState && normalizedCounty && normalizedCity) {
+    const cityMatch = jurisdictions.find(
+      (jurisdiction) =>
+        normalizeText(jurisdiction.state) === normalizedState &&
+        normalizeText(jurisdiction.county) === normalizedCounty &&
+        normalizeText(jurisdiction.city) === normalizedCity &&
+        normalizeText(jurisdiction.jurisdiction_type) === "city"
+    );
+
+    if (cityMatch) {
+      return cityMatch;
+    }
+  }
+
+  if (normalizedState && normalizedCounty) {
+    const countyMatch = jurisdictions.find(
+      (jurisdiction) =>
+        normalizeText(jurisdiction.state) === normalizedState &&
+        normalizeText(jurisdiction.county) === normalizedCounty &&
+        normalizeText(jurisdiction.jurisdiction_type) === "county"
+    );
+
+    if (countyMatch) {
+      return countyMatch;
+    }
+  }
 
   if (!normalizedLocation) {
     return null;
   }
 
   return (
+    jurisdictions.find(
+      (jurisdiction) =>
+        jurisdiction.city &&
+        normalizedLocation.includes(normalizeText(jurisdiction.city)) &&
+        normalizeText(jurisdiction.jurisdiction_type) === "city"
+    ) ??
     jurisdictions.find((jurisdiction) =>
       normalizedLocation.includes(normalizeText(jurisdiction.name))
     ) ??
@@ -54,11 +107,6 @@ function findMatchingJurisdiction(
       (jurisdiction) =>
         jurisdiction.county &&
         normalizedLocation.includes(normalizeText(jurisdiction.county))
-    ) ??
-    jurisdictions.find(
-      (jurisdiction) =>
-        jurisdiction.city &&
-        normalizedLocation.includes(normalizeText(jurisdiction.city))
     ) ??
     null
   );
@@ -94,7 +142,10 @@ export async function POST(request: Request) {
 
       const matchedJurisdiction = findMatchingJurisdiction(
         body.location,
-        (jurisdictions ?? []) as JurisdictionRow[]
+        (jurisdictions ?? []) as JurisdictionRow[],
+        body.projectState,
+        body.projectCounty,
+        body.projectCity
       );
 
       resolvedJurisdictionId = matchedJurisdiction?.id ?? null;
@@ -111,6 +162,7 @@ export async function POST(request: Request) {
         project_county: body.projectCounty?.trim() || null,
         status: "Permit Review",
         risk_level: "Medium",
+        project_city: body.projectCity?.trim() || null,
       } as any)
       .select("*")
       .single();
@@ -137,6 +189,7 @@ export async function POST(request: Request) {
         jurisdictionName: null,
         projectState: createdProject.project_state ?? null,
         projectCounty: createdProject.project_county ?? null,
+        projectCity: createdProject.project_city ?? null,
       },
     });
   } catch (error) {
