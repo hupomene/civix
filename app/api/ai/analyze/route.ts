@@ -11,6 +11,7 @@ import type {
 } from "@/types/ai-review";
 import { getProjectDocumentContext } from "@/lib/database/document-context";
 import { getRelevantJurisdictionChunks } from "@/lib/database/relevant-jurisdiction-chunks";
+import { ragAnalyzeDesignChange } from "@/lib/ai/rag-analyze-design-change";
 
 type ProjectForAnalyze = {
   id: string;
@@ -175,19 +176,30 @@ export async function POST(request: Request) {
     }
 
     try {
-      result = await openAIAnalyzeDesignChange(enrichedBody);
-    } catch (openAIError) {
+      result = await ragAnalyzeDesignChange(enrichedBody);
+      modelUsed = "civix-rag-fastapi";
+    } catch (ragError) {
       console.warn(
-        "OpenAI analysis failed. Falling back to mock analysis:",
-        openAIError
+        "CIVIX RAG analysis failed. Falling back to existing OpenAI analysis:",
+        ragError
       );
 
-      result = mockAnalyzeDesignChange({
-        designChange: body.designChange,
-        documents: body.documents ?? [],
-      });
+      try {
+        result = await openAIAnalyzeDesignChange(enrichedBody);
+        modelUsed = "gpt-4.1-mini";
+      } catch (openAIError) {
+        console.warn(
+          "OpenAI analysis failed. Falling back to mock analysis:",
+          openAIError
+        );
 
-      modelUsed = "mock-fallback";
+        result = mockAnalyzeDesignChange({
+          designChange: body.designChange,
+          documents: body.documents ?? [],
+        });
+
+        modelUsed = "mock-fallback";
+      }
     }
 
     let savedReviewId: string | undefined;
