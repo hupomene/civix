@@ -29,6 +29,7 @@ type AnalyzeResponseWithPersistence = AnalyzeDesignChangeResponse & {
   savedReviewId?: string;
   savedProjectId?: string;
   modelUsed?: string;
+  ragErrorMessage?: string;
   retrievedChunks?: {
     documentName: string;
     chunkIndex: number;
@@ -81,6 +82,7 @@ export async function POST(request: Request) {
 
     let result;
     let modelUsed = "gpt-4.1-mini";
+    let ragErrorMessage: string | undefined;
 
     let enrichedBody: AnalyzeDesignChangeRequest & {
       jurisdictionContext?: string;
@@ -179,6 +181,8 @@ export async function POST(request: Request) {
       result = await ragAnalyzeDesignChange(enrichedBody);
       modelUsed = "civix-rag-fastapi";
     } catch (ragError) {
+      ragErrorMessage =
+        ragError instanceof Error ? ragError.message : String(ragError);
       console.warn(
         "CIVIX RAG analysis failed. Falling back to existing OpenAI analysis:",
         ragError
@@ -234,6 +238,7 @@ export async function POST(request: Request) {
       savedProjectId,
       modelUsed,
       retrievedChunks,
+      ragErrorMessage,
       jurisdictionChunks,
     };
 
