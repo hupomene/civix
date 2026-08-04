@@ -29,7 +29,8 @@ type AnalyzeResponseWithPersistence = AnalyzeDesignChangeResponse & {
   savedReviewId?: string;
   savedProjectId?: string;
   modelUsed?: string;
-  ragErrorMessage?: string;
+  ragErrorMessage?: string | null;
+  debugVersion?: string;
   retrievedChunks?: {
     documentName: string;
     chunkIndex: number;
@@ -237,8 +238,9 @@ export async function POST(request: Request) {
       savedReviewId,
       savedProjectId,
       modelUsed,
+      ragErrorMessage: ragErrorMessage ?? null,
+      debugVersion: "rag-debug-5fee434",
       retrievedChunks,
-      ragErrorMessage,
       jurisdictionChunks,
     };
 
